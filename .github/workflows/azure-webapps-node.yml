@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Claudinha Sense</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+* { box-sizing: border-box; font-family: Arial, sans-serif; }
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: #0b0b0b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+}
+
+.card {
+  width: 100%;
+  max-width: 420px;
+  background: #121212;
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 0 40px rgba(255,255,255,0.05);
+}
+
+h2 {
+  text-align: center;
+  margin: 0;
+}
+
+p {
+  text-align: center;
+  color: #aaa;
+  font-size: 13px;
+}
+
+.tabs {
+  display: flex;
+  gap: 8px;
+  margin: 15px 0;
+}
+
+.tabs button {
+  flex: 1;
+  padding: 10px;
+  border-radius: 10px;
+  border: none;
+  background: #1c1c1c;
+  color: #fff;
+}
+
+.tabs .ativo {
+  background: #fff;
+  color: #000;
+  font-weight: bold;
+}
+
+.checks label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  margin-top: 6px;
+}
+
+.injetar {
+  width: 100%;
+  padding: 12px;
+  margin-top: 15px;
+  border-radius: 12px;
+  border: none;
+  background: #fff;
+  color: #000;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+#saida {
+  margin-top: 15px;
+  background: #0e0e0e;
+  padding: 12px;
+  border-radius: 12px;
+  font-size: 14px;
+}
+
+.marca {
+  display: block;
+  text-align: center;
+  font-size: 11px;
+  color: #666;
+  margin-top: 10px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="card">
+  <h2>Sensibilidade / Auxílio</h2>
+  <p>Configuração automática para seu celular</p>
+
+  <div class="tabs">
+    <button class="ativo">Sensi</button>
+    <button>Auxílio</button>
+  </div>
+
+  <div class="checks">
+    <label><input type="checkbox"> 120 FPS</label>
+    <label><input type="checkbox"> Estabilizar mira</label>
+    <label><input type="checkbox"> Anti tremedeira</label>
+    <label><input type="checkbox"> No recoil</label>
+    <label><input type="checkbox"> Sensibilidade estável</label>
+  </div>
+
+  <button class="injetar" onclick="aplicar()">Injetar</button>
+
+  <div id="saida"></div>
+
+  <span class="marca">© Claudinha Sense</span>
+</div>
+
+<script>
+// =======================
+// DETECÇÃO AUTOMÁTICA
+// =======================
+function detectarCelular() {
+  const ua = navigator.userAgent.toLowerCase();
+  let linha = "Galaxy A";
+
+  if (ua.includes("iphone")) linha = "iPhone";
+  else if (ua.includes("sm-a")) linha = "Galaxy A";
+  else if (ua.includes("sm-m")) linha = "Galaxy M";
+  else if (ua.includes("sm-s")) linha = "Galaxy S";
+  else if (ua.includes("sm-f")) linha = "Galaxy Z";
+  else if (ua.includes("poco")) linha = "Poco";
+  else if (ua.includes("redmi")) linha = "Redmi Note";
+  else if (ua.includes("xiaomi")) linha = "Redmi";
+  else if (ua.includes("motorola") || ua.includes("moto g")) linha = "Moto G";
+  else if (ua.includes("edge")) linha = "Moto Edge";
+
+  return linha;
+}
+
+// =======================
+// BANCO DE SENSIBILIDADE
+// =======================
+const bancoSensi = {
+  "Galaxy A":   { g:[130,170], r:[120,160], x2:[110,150], x4:[100,140], awm:[70,110], o:[120,160] },
+  "Galaxy M":   { g:[120,165], r:[115,155], x2:[105,145], x4:[95,135],  awm:[65,105], o:[115,155] },
+  "Galaxy S":   { g:[140,185], r:[135,180], x2:[125,170], x4:[115,160], awm:[80,120], o:[135,175] },
+  "Galaxy Z":   { g:[135,180], r:[130,175], x2:[120,165], x4:[110,155], awm:[75,115], o:[130,170] },
+
+  "iPhone":     { g:[150,190], r:[145,185], x2:[135,175], x4:[125,165], awm:[90,130], o:[145,185] },
+
+  "Redmi":      { g:[125,165], r:[120,160], x2:[110,150], x4:[100,140], awm:[70,110], o:[120,160] },
+  "Redmi Note": { g:[130,170], r:[125,165], x2:[115,155], x4:[105,145], awm:[75,115], o:[125,165] },
+  "Poco":       { g:[140,185], r:[135,180], x2:[125,170], x4:[115,160], awm:[80,120], o:[135,175] },
+
+  "Moto G":     { g:[120,160], r:[115,155], x2:[105,145], x4:[95,135],  awm:[65,105], o:[115,155] },
+  "Moto Edge":  { g:[140,185], r:[135,180], x2:[125,170], x4:[115,160], awm:[80,120], o:[135,175] }
+};
+
+// =======================
+// GERAÇÃO
+// =======================
+function rand(min, max) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+function aplicar() {
+  const linha = detectarCelular();
+  const s = bancoSensi[linha] || bancoSensi["Galaxy A"];
+
+  document.getElementById("saida").innerHTML = `
+    <strong>Celular detectado:</strong> ${linha}<br><br>
+    Geral: ${rand(...s.g)}<br>
+    Mira Red Dot: ${rand(...s.r)}<br>
+    Mira 2x: ${rand(...s.x2)}<br>
+    Mira 4x: ${rand(...s.x4)}<br>
+    AWM: ${rand(...s.awm)}<br>
+    Olhadinha: ${rand(...s.o)}
+  `;
+}
+</script>
+
+</body>
+</html>
